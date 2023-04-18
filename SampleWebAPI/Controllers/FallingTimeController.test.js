@@ -1,4 +1,6 @@
 const axios = require('axios');
+const knex = require("knex");
+const uuid = require("uuid");
 
 test('GET FallingTime without GA name returns default value', async () => {
     const response = await axios.get('http://localhost:5204/FallingTime');
@@ -22,4 +24,37 @@ describe.each([
 test('GET FallingTime for negative startHeight returns 400', async () => {
     const response = await axios.get('http://localhost:5204/FallingTime?startHeight=-1', {validateStatus: () => true});
     expect(response.status).toBe(400);
+});
+
+describe.each([
+    [0, 1, 0.00],
+    [1, 1, 1.41],
+    [5, 6, 1.29]
+])('startHeight = %s, ga = %s', (startHeight, ga, expectedFallingTime) => {
+    test(`GET FallingTime for startHeight = ${startHeight} and GA = ${ga} returns fallingTime = ${expectedFallingTime}`, async () => {
+        const dbClient = knex({
+            client: 'pg',
+            connection: {
+                host: 'localhost',
+                port: '5432',
+                user: 'postgres',
+                password: 'js-tests'
+            }
+        });
+        
+        const gaData = {
+            Name: uuid.v4(),
+            Value: ga
+        };
+
+        await dbClient
+            .insert(gaData)
+            .into('GravityAcceleration');
+        
+        const response = await axios.get(`http://localhost:5204/FallingTime?startHeight=${startHeight}&gaName=${gaData.Name}`);
+        
+        expect(response.data['value']).toBeCloseTo(expectedFallingTime, 2);
+
+        await dbClient.destroy();
+    });
 });
