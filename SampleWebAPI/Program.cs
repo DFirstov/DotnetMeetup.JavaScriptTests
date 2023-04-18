@@ -4,7 +4,7 @@ using SampleWebAPI.Data;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<FallingTimeContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<GravityAccelerationContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -12,7 +12,7 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
-using (var dataContext = scope.ServiceProvider.GetRequiredService<FallingTimeContext>())
+using (var dataContext = scope.ServiceProvider.GetRequiredService<GravityAccelerationContext>())
 {
 	dataContext.Database.EnsureCreated();
 }
