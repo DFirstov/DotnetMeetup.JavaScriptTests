@@ -1,0 +1,12 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/gravityAcceleration/tomsk"
+  },
+  "response": {
+    "jsonBody": {
+      "name": "tomsk",
+      "value": 9.8160
+    }
+  }
+}
