@@ -1,15 +1,22 @@
+using Microsoft.EntityFrameworkCore;
+using SampleWebAPI.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Add services to the container.
-
+builder.Services.AddDbContext<FallingTimeContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+using (var scope = app.Services.CreateScope())
+using (var dataContext = scope.ServiceProvider.GetRequiredService<FallingTimeContext>())
+{
+	dataContext.Database.EnsureCreated();
+}
+
 if (app.Environment.IsDevelopment())
 {
 	app.UseSwagger();
