@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using SampleWebAPI.Data;
+using SampleWebAPI.Models;
 
 namespace SampleWebAPI.Controllers;
 
@@ -6,23 +8,25 @@ namespace SampleWebAPI.Controllers;
 [Route("[controller]")]
 public class FallingTimeController : ControllerBase
 {
-	private const double GravityAcceleration = 9.81;
+	private readonly GravityAccelerationContext _gravityAccelerationContext;
+
+	public FallingTimeController(GravityAccelerationContext gravityAccelerationContext)
+	{
+		_gravityAccelerationContext = gravityAccelerationContext;
+	}
 
 	[HttpGet]
-	public ActionResult<Model> Get(double startHeight)
+	public ActionResult<FallingTime> Get(double startHeight, string gaName)
 	{
 		if (startHeight < 0)
 		{
 			return BadRequest("Start height must be nonnegative!");
 		}
-		
-		return new Model(GravityAcceleration, startHeight);
-	}
 
-	public record Model(
-		double GravityAcceleration,
-		double StartHeight)
-	{
-		public double FallingTime => Math.Sqrt(2 * StartHeight / GravityAcceleration);
+		var gravityAcceleration = _gravityAccelerationContext.GravityAccelerations.FirstOrDefault(
+			ga => ga.Name == gaName,
+			GravityAcceleration.Default);
+
+		return new FallingTime(gravityAcceleration, startHeight);
 	}
 }
