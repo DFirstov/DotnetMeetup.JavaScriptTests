@@ -16,16 +16,16 @@ public class FallingTimeController : ControllerBase
 	}
 
 	[HttpGet]
-	public ActionResult<FallingTime> Get(double startHeight, string gaName)
+	public ActionResult<FallingTime> Get(double startHeight, string? gaName)
 	{
 		if (startHeight < 0)
 		{
 			return BadRequest("Start height must be nonnegative!");
 		}
 
-		var gravityAcceleration = _gravityAccelerationContext.GravityAccelerations.FirstOrDefault(
-			ga => ga.Name == gaName,
-			GravityAcceleration.Default);
+		var gravityAcceleration =
+			_gravityAccelerationContext.GravityAccelerations.FirstOrDefault(ga => ga.Name == gaName) ??
+			GravityAcceleration.Default;
 
 		return new FallingTime(gravityAcceleration, startHeight);
 	}

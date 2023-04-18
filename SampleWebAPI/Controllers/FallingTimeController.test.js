@@ -1,8 +1,11 @@
 const axios = require('axios');
 
-test('GET FallingTime returns correct GravityAcceleration', async () => {
+test('GET FallingTime without GA name returns default value', async () => {
     const response = await axios.get('http://localhost:5204/FallingTime');
-    expect(response.data['gravityAcceleration']).toBe(9.81);
+    expect(response.data['gravityAcceleration']).toEqual({
+        name: 'default',
+        value: 9.81
+    });
 });
 
 describe.each([
@@ -12,7 +15,7 @@ describe.each([
 ])('startHeight = %s', (startHeight, expectedFallingTime) => {
     test(`GET FallingTime for startHeight = ${startHeight} returns fallingTime = ${expectedFallingTime}`, async () => {
         const response = await axios.get(`http://localhost:5204/FallingTime?startHeight=${startHeight}`);
-        expect(response.data['fallingTime']).toBeCloseTo(expectedFallingTime, 2);
+        expect(response.data['value']).toBeCloseTo(expectedFallingTime, 2);
     });
 });
 
