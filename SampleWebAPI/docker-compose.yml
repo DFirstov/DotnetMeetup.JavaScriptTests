@@ -1,0 +1,10 @@
+version: '3.4'
+
+services: 
+  db:
+    container_name: js-tests-db
+    image: postgres:12.7-alpine
+    environment:
+      POSTGRES_PASSWORD: js-tests
+    ports:
+      - '5432:5432'
