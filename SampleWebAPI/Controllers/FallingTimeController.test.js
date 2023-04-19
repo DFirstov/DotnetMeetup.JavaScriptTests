@@ -41,7 +41,7 @@ describe.each([
                 password: 'js-tests'
             }
         });
-        
+
         const gaData = {
             Name: uuid.v4(),
             Value: ga
@@ -50,9 +50,9 @@ describe.each([
         await dbClient
             .insert(gaData)
             .into('GravityAcceleration');
-        
+
         const response = await axios.get(`http://localhost:5204/FallingTime?startHeight=${startHeight}&gaName=${gaData.Name}`);
-        
+
         expect(response.data['value']).toBeCloseTo(expectedFallingTime, 2);
 
         await dbClient.destroy();
@@ -69,7 +69,7 @@ describe.each([
             name: uuid.v4(),
             value: ga
         };
-        
+
         const mapping = {
             request: {
                 method: 'GET',
@@ -79,11 +79,37 @@ describe.each([
                 jsonBody: gaData
             }
         }
+
+        await axios.post('http://localhost:5433/__admin/mappings', mapping);
+
+        const response = await axios.get(`http://localhost:5204/FallingTime?startHeight=${startHeight}&gaName=${gaData.name}`);
+
+        expect(response.data['value']).toBeCloseTo(expectedFallingTime, 2);
+    });
+});
+
+describe.each([
+    [0, 0.00],
+    [1, 0.45],
+    [5, 1.01]
+])('startHeight = %s', (startHeight, expectedFallingTime) => {
+    test('GET FallingTime uses default GA when service is not accessible', async () => {
+        const gaName = uuid.v4();
+        
+        const mapping = {
+            request: {
+                method: 'GET',
+                urlPattern: `/gravityAcceleration/${gaName}`
+            },
+            response: {
+                status: 503
+            }
+        };
         
         await axios.post('http://localhost:5433/__admin/mappings', mapping);
-        
-        const response = await axios.get(`http://localhost:5204/FallingTime?startHeight=${startHeight}&gaName=${gaData.name}`);
-        
+
+        const response = await axios.get(`http://localhost:5204/FallingTime?startHeight=${startHeight}&gaName=${gaName}`);
+
         expect(response.data['value']).toBeCloseTo(expectedFallingTime, 2);
     });
 });
