@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SampleWebAPI.Clients;
 using SampleWebAPI.Data;
+using SampleWebAPI.Kafka;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -10,6 +11,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient<GravityAccelerationClient>(c => c.BaseAddress = new Uri("http://localhost:5433/"));
+builder.Services.AddSingleton<KafkaClientHandle>();
+builder.Services.AddSingleton<KafkaProducer>();
+builder.Services.AddHostedService<KafkaConsumer>();
 
 var app = builder.Build();
 
