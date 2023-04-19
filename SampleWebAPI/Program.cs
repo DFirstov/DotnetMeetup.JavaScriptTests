@@ -1,13 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using SampleWebAPI.Clients;
 using SampleWebAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<GravityAccelerationContext>(options => options.UseNpgsql(connectionString));
+builder.Services.AddDbContext<GravityAccelerationContext>(o => o.UseNpgsql(connectionString));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient<GravityAccelerationClient>(c => c.BaseAddress = new Uri("http://localhost:5433/"));
 
 var app = builder.Build();
 
@@ -24,9 +26,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
