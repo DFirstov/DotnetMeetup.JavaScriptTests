@@ -31,7 +31,7 @@ describe.each([
     [1, 1, 1.41],
     [5, 6, 1.29]
 ])('startHeight = %s, ga = %s', (startHeight, ga, expectedFallingTime) => {
-    test(`GET FallingTime for startHeight = ${startHeight} and GA = ${ga} returns fallingTime = ${expectedFallingTime}`, async () => {
+    test(`GET FallingTime for startHeight = ${startHeight} and GA = ${ga} in DB returns fallingTime = ${expectedFallingTime}`, async () => {
         const dbClient = knex({
             client: 'pg',
             connection: {
@@ -56,5 +56,34 @@ describe.each([
         expect(response.data['value']).toBeCloseTo(expectedFallingTime, 2);
 
         await dbClient.destroy();
+    });
+});
+
+describe.each([
+    [0, 1, 0.00],
+    [1, 1, 1.41],
+    [5, 6, 1.29]
+])('startHeight = %s, ga = %s', (startHeight, ga, expectedFallingTime) => {
+    test(`GET FallingTime for startHeight = ${startHeight} and GA = ${ga} in service returns fallingTime = ${expectedFallingTime}`, async () => {
+        const gaData = {
+            name: uuid.v4(),
+            value: ga
+        };
+        
+        const mapping = {
+            request: {
+                method: 'GET',
+                urlPattern: `/gravityAcceleration/${gaData.name}`
+            },
+            response: {
+                jsonBody: gaData
+            }
+        }
+        
+        await axios.post('http://localhost:5433/__admin/mappings', mapping);
+        
+        const response = await axios.get(`http://localhost:5204/FallingTime?startHeight=${startHeight}&gaName=${gaData.name}`);
+        
+        expect(response.data['value']).toBeCloseTo(expectedFallingTime, 2);
     });
 });
