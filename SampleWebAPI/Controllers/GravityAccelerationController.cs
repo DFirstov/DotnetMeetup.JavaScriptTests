@@ -21,17 +21,28 @@ public class GravityAccelerationController : ControllerBase
 	}
 
 	[HttpPost]
-	public async Task<ActionResult> PostGravityAcceleration(GravityAcceleration ga)
+	public async Task<ActionResult> PostGravityAcceleration(GravityAcceleration ga, CancellationToken ct)
 	{
-		_gaContext.GravityAccelerations.Add(ga);
-		await _gaContext.SaveChangesAsync();
-
-		await _kafkaProducer.ProduceAsync(new Message<string, string>
-		{
-			Key = ga.Name,
-			Value = ga.Value.ToString(CultureInfo.InvariantCulture)
-		});
+		await SaveGravityAcceleration(ga, ct);
+		await ProduceMessage(ga, ct);
 
 		return Ok();
+	}
+
+	private Task SaveGravityAcceleration(GravityAcceleration ga, CancellationToken ct)
+	{
+		_gaContext.GravityAccelerations.Add(ga);
+		return _gaContext.SaveChangesAsync(ct);
+	}
+
+	private Task ProduceMessage(GravityAcceleration ga, CancellationToken ct)
+	{
+		return _kafkaProducer.ProduceAsync(
+			new Message<string, string>
+			{
+				Key = ga.Name,
+				Value = ga.Value.ToString(CultureInfo.InvariantCulture)
+			},
+			ct);
 	}
 }

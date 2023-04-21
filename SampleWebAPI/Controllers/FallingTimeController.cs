@@ -28,11 +28,14 @@ public class FallingTimeController : ControllerBase
 		}
 
 		var gravityAcceleration = gaName != null
-			? await _gaContext.GravityAccelerations.FirstOrDefaultAsync(ga => ga.Name == gaName, ct) ??
-			  await _gaClient.GetGravityAcceleration(gaName, ct) ??
-			  GravityAcceleration.Default
+			? await GetGravityAcceleration(gaName, ct)
 			: GravityAcceleration.Default;
 
 		return new FallingTime(gravityAcceleration, startHeight);
 	}
+
+	private async Task<GravityAcceleration> GetGravityAcceleration(string gaName, CancellationToken ct) =>
+		await _gaContext.GravityAccelerations.FirstOrDefaultAsync(ga => ga.Name == gaName, ct) ??
+		await _gaClient.GetGravityAcceleration(gaName, ct) ??
+		GravityAcceleration.Default;
 }
