@@ -10,15 +10,13 @@ namespace SampleWebAPI.Controllers;
 [Route("[controller]")]
 public class FallingTimeController : ControllerBase
 {
-	private readonly GravityAccelerationContext _gravityAccelerationContext;
-	private readonly GravityAccelerationClient _gravityAccelerationClient;
+	private readonly GravityAccelerationContext _gaContext;
+	private readonly GravityAccelerationClient _gaClient;
 
-	public FallingTimeController(
-		GravityAccelerationContext gravityAccelerationContext,
-		GravityAccelerationClient gravityAccelerationClient)
+	public FallingTimeController(GravityAccelerationContext gaContext, GravityAccelerationClient gaClient)
 	{
-		_gravityAccelerationContext = gravityAccelerationContext;
-		_gravityAccelerationClient = gravityAccelerationClient;
+		_gaContext = gaContext;
+		_gaClient = gaClient;
 	}
 
 	[HttpGet]
@@ -30,8 +28,8 @@ public class FallingTimeController : ControllerBase
 		}
 
 		var gravityAcceleration = gaName != null
-			? await _gravityAccelerationContext.GravityAccelerations.FirstOrDefaultAsync(ga => ga.Name == gaName, ct) ??
-			  await _gravityAccelerationClient.GetGravityAcceleration(gaName, ct) ??
+			? await _gaContext.GravityAccelerations.FirstOrDefaultAsync(ga => ga.Name == gaName, ct) ??
+			  await _gaClient.GetGravityAcceleration(gaName, ct) ??
 			  GravityAcceleration.Default
 			: GravityAcceleration.Default;
 

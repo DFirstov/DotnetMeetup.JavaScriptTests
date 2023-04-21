@@ -8,8 +8,8 @@ public class GravityAccelerationContext : DbContext
 	public GravityAccelerationContext(DbContextOptions<GravityAccelerationContext> options) : base(options)
 	{
 	}
-	
-	public DbSet<GravityAcceleration> GravityAccelerations { get; set; }
+
+	public DbSet<GravityAcceleration> GravityAccelerations { get; set; } = null!;
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

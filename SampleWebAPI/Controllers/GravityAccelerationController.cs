@@ -11,27 +11,25 @@ namespace SampleWebAPI.Controllers;
 [Route("[controller]")]
 public class GravityAccelerationController : ControllerBase
 {
-	private readonly GravityAccelerationContext _gravityAccelerationContext;
+	private readonly GravityAccelerationContext _gaContext;
 	private readonly KafkaProducer _kafkaProducer;
 
-	public GravityAccelerationController(
-		GravityAccelerationContext gravityAccelerationContext,
-		KafkaProducer kafkaProducer)
+	public GravityAccelerationController(GravityAccelerationContext gaContext, KafkaProducer kafkaProducer)
 	{
-		_gravityAccelerationContext = gravityAccelerationContext;
+		_gaContext = gaContext;
 		_kafkaProducer = kafkaProducer;
 	}
 
 	[HttpPost]
-	public async Task<ActionResult> PostGravityAcceleration(GravityAcceleration gravityAcceleration)
+	public async Task<ActionResult> PostGravityAcceleration(GravityAcceleration ga)
 	{
-		_gravityAccelerationContext.GravityAccelerations.Add(gravityAcceleration);
-		await _gravityAccelerationContext.SaveChangesAsync();
+		_gaContext.GravityAccelerations.Add(ga);
+		await _gaContext.SaveChangesAsync();
 
-		await _kafkaProducer.ProduceAsync(new Message<string, string>()
+		await _kafkaProducer.ProduceAsync(new Message<string, string>
 		{
-			Key = gravityAcceleration.Name,
-			Value = gravityAcceleration.Value.ToString(CultureInfo.InvariantCulture)
+			Key = ga.Name,
+			Value = ga.Value.ToString(CultureInfo.InvariantCulture)
 		});
 
 		return Ok();

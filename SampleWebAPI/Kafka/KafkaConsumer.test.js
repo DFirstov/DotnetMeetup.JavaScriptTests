@@ -2,7 +2,7 @@ const kafkajs = require('kafkajs');
 const uuid = require("uuid");
 const axios = require("axios");
 
-test('Message in Kafka leads to posting gravity acceleration to the service', async () => {
+test('Message in Kafka leads to posting GA to the service', async () => {
     const kafka = new kafkajs.Kafka({
         brokers: ['127.0.0.1:9093']
     });

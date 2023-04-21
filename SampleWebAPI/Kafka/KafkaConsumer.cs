@@ -8,15 +8,15 @@ public class KafkaConsumer : BackgroundService
 {
 	private readonly string _topic;
 	private readonly IConsumer<string, string> _kafkaConsumer;
-	private readonly GravityAccelerationClient _gravityAccelerationClient;
+	private readonly GravityAccelerationClient _gaClient;
 
-	public KafkaConsumer(IConfiguration configuration, GravityAccelerationClient gravityAccelerationClient)
+	public KafkaConsumer(IConfiguration configuration, GravityAccelerationClient gaClient)
 	{
 		ConsumerConfig consumerConfig = new();
 		configuration.GetSection("Kafka:ConsumerSettings").Bind(consumerConfig);
 		_topic = configuration.GetValue<string>("Kafka:Topic");
 		_kafkaConsumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
-		_gravityAccelerationClient = gravityAccelerationClient;
+		_gaClient = gaClient;
 	}
 
 	protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -34,11 +34,11 @@ public class KafkaConsumer : BackgroundService
 			{
 				var consumeResult = _kafkaConsumer.Consume(stoppingToken);
 
-				GravityAcceleration gravityAcceleration = new(
+				GravityAcceleration ga = new(
 					consumeResult.Message.Key,
 					double.Parse(consumeResult.Message.Value));
 
-				await _gravityAccelerationClient.PostGravityAcceleration(gravityAcceleration, stoppingToken);
+				await _gaClient.PostGravityAcceleration(ga, stoppingToken);
 
 				_kafkaConsumer.Commit(consumeResult);
 			}
