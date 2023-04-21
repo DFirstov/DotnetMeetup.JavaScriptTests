@@ -26,14 +26,6 @@ public class GravityAccelerationClient
 
 	public async Task PostGravityAcceleration(GravityAcceleration ga, CancellationToken ct)
 	{
-		try
-		{
-			await _httpClient.PostAsJsonAsync("gravityAcceleration", ga, ct);
-		}
-		catch (Exception e)
-		{
-			Console.WriteLine(e);
-			throw;
-		}
+		await _httpClient.PostAsJsonAsync("gravityAcceleration", ga, ct);
 	}
 }
