@@ -1,7 +1,7 @@
 const axios = require('axios')
 const uuid = require('uuid')
 const {createDbClient} = require("../Testing/dbUtils")
-const {waitForMessage} = require("../Testing/kafkaUtils")
+const {waitForProducing} = require("../Testing/kafkaUtils")
 
 describe('POST GravityAcceleration', () => {
     const dbClient = createDbClient()
@@ -30,7 +30,7 @@ test('POST GravityAcceleration produces message to Kafka', async () => {
     // Act
     const gaName = uuid.v4();
     const ga = 234
-    const gaFromKafka = await waitForMessage('ga-created', gaName, async () => {
+    const gaFromKafka = await waitForProducing('ga-created', gaName, async () => {
         const url = 'http://localhost:5204/GravityAcceleration'
         await axios.post(url, {
             name: gaName,

@@ -31,7 +31,15 @@ async function configureGravityAccelerationMock503(gaName) {
     await axios.post('http://localhost:5433/__admin/mappings', mapping)
 }
 
+async function getReceivedRequestBodies(url) {
+    const response = await axios.get('http://localhost:5433/__admin/requests')
+    return response.data.requests
+        .filter(request => request.request.url === url)
+        .map(request => JSON.parse(request.request.body.toString()))
+}
+
 module.exports = {
     configureGravityAccelerationMockOK,
-    configureGravityAccelerationMock503
+    configureGravityAccelerationMock503,
+    getReceivedRequestBodies
 }
