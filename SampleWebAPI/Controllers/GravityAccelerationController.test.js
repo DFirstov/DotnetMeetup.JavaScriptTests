@@ -1,70 +1,43 @@
-const axios = require('axios');
-const knex = require('knex');
-const uuid = require('uuid');
-const kafkajs = require('kafkajs');
+const axios = require('axios')
+const uuid = require('uuid')
+const {createDbClient} = require("../Testing/dbUtils")
+const {waitForMessage} = require("../Testing/kafkaUtils")
 
-test('POST GravityAcceleration saves object to database', async () => {
-    const expectedGa = {
-        name: uuid.v4(),
-        value: 123
-    }
+describe('POST GravityAcceleration', () => {
+    const dbClient = createDbClient()
 
-    await axios.post('http://localhost:5204/GravityAcceleration', expectedGa);
+    test('POST GravityAcceleration saves object to database', async () => {
+        // Act
+        const gaName = uuid.v4()
+        const ga = 123
+        const url = 'http://localhost:5204/GravityAcceleration'
+        await axios.post(url, {
+            name: gaName,
+            value: ga
+        })
 
-    const dbClient = knex({
-        client: 'pg',
-        connection: {
-            host: 'localhost',
-            port: '5432',
-            user: 'postgres',
-            password: 'js-tests'
-        }
-    });
+        // Assert
+        const gaFromDb = await dbClient
+            .select('*')
+            .from('GravityAcceleration')
+            .where({Name: gaName})
 
-    const actualGa = await dbClient
-        .select('*')
-        .from('GravityAcceleration')
-        .where({Name: expectedGa.name});
-
-    expect(actualGa).toEqual([{
-        Name: expectedGa.name,
-        Value: expectedGa.value
-    }]);
-    
-    await dbClient.destroy();
-});
+        expect(gaFromDb[0].Value).toBe(ga)
+    })
+})
 
 test('POST GravityAcceleration produces message to Kafka', async () => {
-    const kafka = new kafkajs.Kafka({
-        brokers: ['127.0.0.1:9093']
-    });
-    
-    const consumer = kafka.consumer({groupId: 'js-tests'});
-    
-    await consumer.connect();
-    await consumer.subscribe({topic: 'ga-created'});
-    
-    const messages = [];
-    
-    await consumer.run({
-        eachMessage: async ({message}) => {
-            messages.push(message);
-        }
-    });
+    // Act
+    const gaName = uuid.v4();
+    const ga = 234
+    const gaFromKafka = await waitForMessage('ga-created', gaName, async () => {
+        const url = 'http://localhost:5204/GravityAcceleration'
+        await axios.post(url, {
+            name: gaName,
+            value: ga
+        })
+    })
 
-    const expectedGa = {
-        name: uuid.v4(),
-        value: 123
-    }
-
-    await axios.post('http://localhost:5204/GravityAcceleration', expectedGa);
-    
-    let message;
-    
-    while (!message) {
-        message = messages.find(m => m.key.toString() === expectedGa.name);
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    
-    expect(message.value.toString()).toBe('123');
-}, 60_000);
+    // Assert
+    expect(parseFloat(gaFromKafka)).toBe(ga)
+}, 10_000)
