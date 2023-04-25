@@ -1,8 +1,11 @@
+using JetBrains.Annotations;
+
 namespace SampleWebAPI.Models;
 
-public record FallingTime(
-	GravityAcceleration GravityAcceleration,
-	double StartHeight)
+[PublicAPI]
+public record FallingTime(double StartHeight)
 {
-	public double Value => Math.Sqrt(2 * StartHeight / GravityAcceleration.Value);
+	public double GravityAcceleration => 9.81;
+
+	public double Value => Math.Sqrt(2 * StartHeight / GravityAcceleration);
 }
