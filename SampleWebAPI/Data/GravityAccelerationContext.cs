@@ -5,7 +5,8 @@ namespace SampleWebAPI.Data;
 
 public class GravityAccelerationContext : DbContext
 {
-	public GravityAccelerationContext(DbContextOptions<GravityAccelerationContext> options) : base(options)
+	public GravityAccelerationContext(DbContextOptions<GravityAccelerationContext> options)
+		: base(options)
 	{
 	}
 

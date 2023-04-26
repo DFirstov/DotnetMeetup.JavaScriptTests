@@ -11,11 +11,11 @@ public class GravityAccelerationClient
 		_httpClient = httpClient;
 	}
 
-	public async Task<GravityAcceleration?> GetGravityAcceleration(string gaName, CancellationToken ct)
+	public async Task<GravityAcceleration?> GetGravityAcceleration(string gaName)
 	{
 		try
 		{
-			return await _httpClient.GetFromJsonAsync<GravityAcceleration>($"gravityAcceleration/{gaName}", ct);
+			return await _httpClient.GetFromJsonAsync<GravityAcceleration>($"gravityAcceleration/{gaName}");
 		}
 		catch (Exception e)
 		{
