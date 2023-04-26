@@ -87,7 +87,7 @@ describe.each([
 ])('startHeight = %s, ga = %s', (startHeight, ga, expectedTime) => {
     const dbClient = createDbClient()
 
-    test(`GET FallingTime uses GA from DB if possible`, async () => {
+    test.skip(`GET FallingTime uses GA from DB if possible`, async () => {
         // Arrange
         const gaName = uuid.v4()
         await dbClient

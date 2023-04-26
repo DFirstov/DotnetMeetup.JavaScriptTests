@@ -1,6 +1,14 @@
 version: '3.4'
 
-services: 
+services:
+  mock:
+    container_name: js-tests-mock
+    image: wiremock/wiremock:2.32.0
+    ports:
+      - '5433:8080'
+    volumes:
+      - ./Mocks:/home/wiremock/mappings
+
   db:
     container_name: js-tests-db
     image: postgres:12.7-alpine
@@ -9,14 +17,6 @@ services:
     ports:
       - '5432:5432'
 
-  mock:
-    container_name: js-tests-mock
-    image: wiremock/wiremock:2.32.0
-    ports:
-      - '5433:8080'
-    volumes:
-      - ./Mocks:/home/wiremock/mappings
-        
   zookeeper:
     container_name: js-tests-zookeeper
     image: confluentinc/cp-zookeeper:latest

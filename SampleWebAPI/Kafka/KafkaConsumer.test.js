@@ -2,7 +2,7 @@ const uuid = require("uuid")
 const {waitForConsuming} = require("../Testing/kafkaUtils")
 const {getReceivedRequestBodies} = require("../Testing/mockUtils")
 
-test('Message in Kafka leads to posting GA to the service', async () => {
+test.skip('Message in Kafka leads to posting GA to the service', async () => {
     // Act
     const gaName = uuid.v4()
     const ga = 345

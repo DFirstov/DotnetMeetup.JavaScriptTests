@@ -13,7 +13,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient<GravityAccelerationClient>(c => c.BaseAddress = new Uri("http://localhost:5433/"));
 builder.Services.AddSingleton<KafkaClientHandle>();
 builder.Services.AddSingleton<KafkaProducer>();
-builder.Services.AddHostedService<KafkaConsumer>();
 
 var app = builder.Build();
 
