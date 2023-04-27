@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 const kafkajs = require("kafkajs")
 
 async function waitForProducing(topic, key, action) {

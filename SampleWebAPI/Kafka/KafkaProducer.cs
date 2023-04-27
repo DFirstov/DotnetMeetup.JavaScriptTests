@@ -13,8 +13,8 @@ public class KafkaProducer
 		_kafkaHandle = new DependentProducerBuilder<string, string>(handle.Handle).Build();
 	}
 
-	public Task ProduceAsync(Message<string, string> message, CancellationToken ct)
+	public Task ProduceAsync(Message<string, string> message)
 	{
-		return _kafkaHandle.ProduceAsync(_topic, message, ct);
+		return _kafkaHandle.ProduceAsync(_topic, message);
 	}
 }

@@ -43,8 +43,6 @@ services:
   kafka-init:
     container_name: js-tests-kafka-init
     image: confluentinc/cp-kafka:latest
-    depends_on: 
-      - kafka
     command: "bash -c 'cub zk-ready zookeeper:2181 600 && \
                        cub kafka-ready -b kafka:9092 1 600 && \
                        kafka-topics \
